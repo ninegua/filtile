@@ -118,8 +118,17 @@ impl Layout for FilTile {
             TileType::Bottom => rotate(flip(base)),
         };
 
+        let is_smart_gap_enabled = config.smart_h.is_some() || config.smart_v.is_some();
+
         // monocle
         if config.monocle {
+            if is_smart_gap_enabled {
+                let existing = (config.inner + config.outer) as i32;
+                let transform = |i: Option<u32>| i.map(|i| i as i32).unwrap_or(existing) - existing;
+                let h = transform(config.smart_h);
+                let v = transform(config.smart_v);
+                tile = Box::new(Padded::new(tile, h, v));
+            }
             tile = Box::new(Monocle::new(tile));
             name = "◎";
 
@@ -138,7 +147,7 @@ impl Layout for FilTile {
             }
 
         // or, smart gaps
-        } else if view_count == 1 && (config.smart_h.is_some() || config.smart_v.is_some()) {
+        } else if view_count == 1 && is_smart_gap_enabled {
             let existing = (config.inner + config.outer) as i32;
 
             let transform = |i: Option<u32>| i.map(|i| i as i32).unwrap_or(existing) - existing;
