@@ -122,7 +122,7 @@ impl Layout for FilTile {
 
         // monocle
         if config.monocle {
-            if is_smart_gap_enabled {
+            if view_count > 1 && is_smart_gap_enabled {
                 let existing = (config.inner + config.outer) as i32;
                 let transform = |i: Option<u32>| i.map(|i| i as i32).unwrap_or(existing) - existing;
                 let h = transform(config.smart_h);
